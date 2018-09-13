@@ -18,7 +18,6 @@ class NowPlayingViewController: UIViewController,UITableViewDataSource {
     var movies: [[String: Any]] = []
     var refreshControl: UIRefreshControl!
     override func viewDidLoad() {
-        
         tableView.rowHeight = 217
         super.viewDidLoad()
         self.activityIndicator.startAnimating()
@@ -28,6 +27,21 @@ class NowPlayingViewController: UIViewController,UITableViewDataSource {
         tableView.dataSource = self
         fetchMovies()
         self.activityIndicator.stopAnimating()
+        
+       
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    
+        let alertController = UIAlertController(title: "Cannot Get Movies", message: "The Internet connection appears to be offline.", preferredStyle: .alert)
+        
+        let TryAction = UIAlertAction(title: "Try Again", style: .default) { (action) in
+            self.fetchMovies()
+        }
+        
+        alertController.addAction(TryAction)
+        self.present(alertController, animated: true,completion: nil)
     }
     
     @objc func didPullToRefresh(_ refreshControl: UIRefreshControl){
