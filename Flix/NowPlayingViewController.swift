@@ -20,28 +20,20 @@ class NowPlayingViewController: UIViewController,UITableViewDataSource {
     override func viewDidLoad() {
         tableView.rowHeight = 217
         super.viewDidLoad()
+        
+        self.view.addSubview(self.activityIndicator)
+        activityIndicator.center = self.view.center
         self.activityIndicator.startAnimating()
+        
+        
+       
         refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector (NowPlayingViewController.didPullToRefresh(_:)), for: .valueChanged)
         tableView.insertSubview(refreshControl, at: 0)
         tableView.dataSource = self
         fetchMovies()
-        self.activityIndicator.stopAnimating()
         
        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    
-        let alertController = UIAlertController(title: "Cannot Get Movies", message: "The Internet connection appears to be offline.", preferredStyle: .alert)
-        
-        let TryAction = UIAlertAction(title: "Try Again", style: .default) { (action) in
-            self.fetchMovies()
-        }
-        
-        alertController.addAction(TryAction)
-        self.present(alertController, animated: true,completion: nil)
     }
     
     @objc func didPullToRefresh(_ refreshControl: UIRefreshControl){
@@ -56,12 +48,19 @@ class NowPlayingViewController: UIViewController,UITableViewDataSource {
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error{
                 print(error.localizedDescription)
-            }else if let data = data{
+                let alertController = UIAlertController(title: "Cannot Get Movies", message: "The Internet connection appears to be offline.", preferredStyle: .alert)
+                let TryAction = UIAlertAction(title: "Try Again", style: .default) { (action) in
+                }
+                alertController.addAction(TryAction)
+                self.present(alertController, animated: true,completion: nil)
+                
+            } else if let data = data{
                 let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String:Any]
                 let movies = dataDictionary["results"] as! [[String:Any]]
                 self.movies = movies
                 self.tableView.reloadData()
                 self.refreshControl.endRefreshing()
+                self.activityIndicator.stopAnimating()
                 
             }
         }
